@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <RollForward>LatestMajor</RollForward>
-    <Version>2.7.1</Version>
+    <Version>2.7.1-ch</Version>
     <Description>Steam 下载工具</Description>
     <Authors>SteamRE 团队</Authors>
     <Copyright>版权所有 © SteamRE 团队 2024</Copyright>
