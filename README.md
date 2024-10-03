@@ -9,7 +9,7 @@ Steam depot 下载器使用 SteamKit2 库。支持 .NET 8.0
 
 ### 从 GitHub 下载
 
-从[发布页面](https://github.com/Aruvelut-123/DepotDownloader-Chinese/releases/latest)下载。
+从[每日构建页面](https://github.com/Aruvelut-123/DepotDownloader-Chinese/actions)下载。
 
 ### 通过 Windows 包管理器 CLI (又叫 winget) (仅限未汉化版)
 
