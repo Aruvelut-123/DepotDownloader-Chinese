@@ -428,7 +428,7 @@ namespace DepotDownloader
         static void PrintVersion(bool printExtra = false)
         {
             var version = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
-            Console.WriteLine($"DepotDownloader v{version}");
+            Console.WriteLine($"DepotDownloader v{version}-ch");
 
             if (!printExtra)
             {
