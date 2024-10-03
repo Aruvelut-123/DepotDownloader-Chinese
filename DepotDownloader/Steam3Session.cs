@@ -87,7 +87,7 @@ namespace DepotDownloader
             this.callbacks.Subscribe<SteamUser.LoggedOnCallback>(LogOnCallback);
             this.callbacks.Subscribe<SteamApps.LicenseListCallback>(LicenseListCallback);
 
-            Console.Write("Connecting to Steam3...");
+            Console.Write("正在连接到 Steam3...");
             Connect();
         }
 
@@ -138,7 +138,7 @@ namespace DepotDownloader
                 completed = true;
                 if (appTokens.AppTokensDenied.Contains(appId))
                 {
-                    Console.WriteLine("Insufficient privileges to get access token for app {0}", appId);
+                    Console.WriteLine("权限不足，无法获取应用 {0} 的访问令牌", appId);
                 }
 
                 foreach (var token_dict in appTokens.AppTokens)
@@ -161,7 +161,7 @@ namespace DepotDownloader
                 {
                     var app = app_value.Value;
 
-                    Console.WriteLine("Got AppInfo for {0}", app.ID);
+                    Console.WriteLine("获取到应用 {0} 的信息", app.ID);
                     AppInfo[app.ID] = app;
                 }
 
@@ -256,7 +256,7 @@ namespace DepotDownloader
             Action<SteamApps.DepotKeyCallback> cbMethod = depotKey =>
             {
                 completed = true;
-                Console.WriteLine("Got depot key for {0} result: {1}", depotKey.DepotID, depotKey.Result);
+                Console.WriteLine("获取到 depot {0} 的密钥，结果为: {1}", depotKey.DepotID, depotKey.Result);
 
                 if (depotKey.Result != EResult.OK)
                 {
@@ -281,7 +281,7 @@ namespace DepotDownloader
 
             var requestCode = await steamContent.GetManifestRequestCode(depotId, appId, manifestId, branch);
 
-            Console.WriteLine("Got manifest request code for {0} {1} result: {2}",
+            Console.WriteLine("获取到 {0} 的 manifest {1} 请求代码，结果为: {2}",
                 depotId, manifestId,
                 requestCode);
 
@@ -298,11 +298,11 @@ namespace DepotDownloader
                 return;
             }
 
-            DebugLog.WriteLine(nameof(Steam3Session), $"Requesting CDN auth token for {server.Host}");
+            DebugLog.WriteLine(nameof(Steam3Session), $"正在请求服务器 {server.Host} 的 CDN 验证密钥");
 
             var cdnAuth = await steamApps.GetCDNAuthToken(appid, depotid, server.Host);
 
-            Console.WriteLine($"Got CDN auth token for {server.Host} result: {cdnAuth.Result} (expires {cdnAuth.Expiration})");
+            Console.WriteLine($"获取到服务器 {server.Host} 的 CDN 验证密钥，结果为: {cdnAuth.Result} (过期时间 {cdnAuth.Expiration})");
 
             if (cdnAuth.Result != EResult.OK)
             {
@@ -319,7 +319,7 @@ namespace DepotDownloader
             {
                 completed = true;
 
-                Console.WriteLine("Retrieved {0} beta keys with result: {1}", appPassword.BetaPasswords.Count, appPassword.Result);
+                Console.WriteLine("获取到 {0} 测试密钥，结果为: {1}", appPassword.BetaPasswords.Count, appPassword.Result);
 
                 foreach (var entry in appPassword.BetaPasswords)
                 {
@@ -351,7 +351,7 @@ namespace DepotDownloader
                 }
                 else
                 {
-                    throw new Exception($"EResult {(int)callback.Result} ({callback.Result}) while retrieving file details for pubfile {pubFile}.");
+                    throw new Exception($"获取 pubfile {pubFile} 的文件信息时出现错误 {(int)callback.Result} ({callback.Result})。");
                 }
             };
 
@@ -382,7 +382,7 @@ namespace DepotDownloader
                 }
                 else
                 {
-                    throw new Exception($"EResult {(int)callback.Result} ({callback.Result}) while retrieving UGC details for {ugcHandle}.");
+                    throw new Exception($"获取 {ugcHandle} 的 UGC 详情时出现错误 {(int)callback.Result} ({callback.Result})。");
                 }
             };
 
@@ -456,14 +456,14 @@ namespace DepotDownloader
 
             if (diff > STEAM3_TIMEOUT && !bConnected)
             {
-                Console.WriteLine("Timeout connecting to Steam3.");
+                Console.WriteLine("连接到 Steam3 超时。");
                 Abort();
             }
         }
 
         private async void ConnectedCallback(SteamClient.ConnectedCallback connected)
         {
-            Console.WriteLine(" Done!");
+            Console.WriteLine(" 完成！");
             bConnecting = false;
             bConnected = true;
 
@@ -474,14 +474,14 @@ namespace DepotDownloader
 
             if (!authenticatedUser)
             {
-                Console.Write("Logging anonymously into Steam3...");
+                Console.Write("使用匿名账户登录到 Steam3 中...");
                 steamUser.LogOnAnonymous();
             }
             else
             {
                 if (logonDetails.Username != null)
                 {
-                    Console.WriteLine("Logging '{0}' into Steam3...", logonDetails.Username);
+                    Console.WriteLine("使用账户 '{0}' 登录到 Steam3 中...", logonDetails.Username);
                 }
 
                 if (authSession is null)
@@ -506,14 +506,14 @@ namespace DepotDownloader
                         }
                         catch (Exception ex)
                         {
-                            Console.Error.WriteLine("Failed to authenticate with Steam: " + ex.Message);
+                            Console.Error.WriteLine("无法和 Steam 进行验证: " + ex.Message);
                             Abort(false);
                             return;
                         }
                     }
                     else if (logonDetails.AccessToken is null && ContentDownloader.Config.UseQrCode)
                     {
-                        Console.WriteLine("Logging in with QR code...");
+                        Console.WriteLine("使用二维码登录中...");
 
                         try
                         {
@@ -529,7 +529,7 @@ namespace DepotDownloader
                             session.ChallengeURLChanged = () =>
                             {
                                 Console.WriteLine();
-                                Console.WriteLine("The QR code has changed:");
+                                Console.WriteLine("二维码已变更，请扫描新的二维码:");
 
                                 DisplayQrCode(session.ChallengeURL);
                             };
@@ -543,7 +543,7 @@ namespace DepotDownloader
                         }
                         catch (Exception ex)
                         {
-                            Console.Error.WriteLine("Failed to authenticate with Steam: " + ex.Message);
+                            Console.Error.WriteLine("无法和 Steam 进行验证: " + ex.Message);
                             Abort(false);
                             return;
                         }
@@ -577,7 +577,7 @@ namespace DepotDownloader
                     }
                     catch (Exception ex)
                     {
-                        Console.Error.WriteLine("Failed to authenticate with Steam: " + ex.Message);
+                        Console.Error.WriteLine("无法和 Steam 进行验证: " + ex.Message);
                         Abort(false);
                         return;
                     }
@@ -593,30 +593,30 @@ namespace DepotDownloader
         {
             bDidDisconnect = true;
 
-            DebugLog.WriteLine(nameof(Steam3Session), $"Disconnected: bIsConnectionRecovery = {bIsConnectionRecovery}, UserInitiated = {disconnected.UserInitiated}, bExpectingDisconnectRemote = {bExpectingDisconnectRemote}");
+            DebugLog.WriteLine(nameof(Steam3Session), $"已断开连接: bIsConnectionRecovery = {bIsConnectionRecovery}, UserInitiated = {disconnected.UserInitiated}, bExpectingDisconnectRemote = {bExpectingDisconnectRemote}");
 
             // When recovering the connection, we want to reconnect even if the remote disconnects us
             if (!bIsConnectionRecovery && (disconnected.UserInitiated || bExpectingDisconnectRemote))
             {
-                Console.WriteLine("Disconnected from Steam");
+                Console.WriteLine("已从 Steam 断开连接");
 
                 // Any operations outstanding need to be aborted
                 bAborted = true;
             }
             else if (connectionBackoff >= 10)
             {
-                Console.WriteLine("Could not connect to Steam after 10 tries");
+                Console.WriteLine("10 次重试后仍无法连接到 Steam");
                 Abort(false);
             }
             else if (!bAborted)
             {
                 if (bConnecting)
                 {
-                    Console.WriteLine("Connection to Steam failed. Trying again");
+                    Console.WriteLine("无法连接到 Steam。请重试");
                 }
                 else
                 {
-                    Console.WriteLine("Lost connection to Steam. Reconnecting");
+                    Console.WriteLine("与 Steam 的连接已终端。重连中");
                 }
 
                 Thread.Sleep(1000 * ++connectionBackoff);
@@ -645,14 +645,14 @@ namespace DepotDownloader
 
                 if (!isAccessToken)
                 {
-                    Console.WriteLine("This account is protected by Steam Guard.");
+                    Console.WriteLine("此账户被 Steam Guard 保护。");
                 }
 
                 if (is2FA)
                 {
                     do
                     {
-                        Console.Write("Please enter your 2 factor auth code from your authenticator app: ");
+                        Console.Write("请输入来自你的验证应用的 2 步验证码: ");
                         logonDetails.TwoFactorCode = Console.ReadLine();
                     } while (string.Empty == logonDetails.TwoFactorCode);
                 }
@@ -662,7 +662,7 @@ namespace DepotDownloader
                     AccountSettingsStore.Save();
 
                     // TODO: Handle gracefully by falling back to password prompt?
-                    Console.WriteLine($"Access token was rejected ({loggedOn.Result}).");
+                    Console.WriteLine($"访问密钥已被撤回 ({loggedOn.Result}).");
                     Abort(false);
                     return;
                 }
@@ -670,12 +670,12 @@ namespace DepotDownloader
                 {
                     do
                     {
-                        Console.Write("Please enter the authentication code sent to your email address: ");
+                        Console.Write("请输入发送到你邮箱里的验证码: ");
                         logonDetails.AuthCode = Console.ReadLine();
                     } while (string.Empty == logonDetails.AuthCode);
                 }
 
-                Console.Write("Retrying Steam3 connection...");
+                Console.Write("正在重试 Steam3 连接...");
                 Connect();
 
                 return;
@@ -683,7 +683,7 @@ namespace DepotDownloader
 
             if (loggedOn.Result == EResult.TryAnotherCM)
             {
-                Console.Write("Retrying Steam3 connection (TryAnotherCM)...");
+                Console.Write("正在重试 Steam3 连接 (TryAnotherCM)...");
 
                 Reconnect();
 
@@ -692,7 +692,7 @@ namespace DepotDownloader
 
             if (loggedOn.Result == EResult.ServiceUnavailable)
             {
-                Console.WriteLine("Unable to login to Steam3: {0}", loggedOn.Result);
+                Console.WriteLine("无法登录到 Steam3: {0}", loggedOn.Result);
                 Abort(false);
 
                 return;
@@ -700,20 +700,20 @@ namespace DepotDownloader
 
             if (loggedOn.Result != EResult.OK)
             {
-                Console.WriteLine("Unable to login to Steam3: {0}", loggedOn.Result);
+                Console.WriteLine("无法登录到 Steam3: {0}", loggedOn.Result);
                 Abort();
 
                 return;
             }
 
-            Console.WriteLine(" Done!");
+            Console.WriteLine(" 完成！");
 
             this.seq++;
             IsLoggedOn = true;
 
             if (ContentDownloader.Config.CellID == 0)
             {
-                Console.WriteLine("Using Steam3 suggested CellID: " + loggedOn.CellID);
+                Console.WriteLine("使用 Steam3 推荐的 CellID: " + loggedOn.CellID);
                 ContentDownloader.Config.CellID = (int)loggedOn.CellID;
             }
         }
@@ -722,13 +722,13 @@ namespace DepotDownloader
         {
             if (licenseList.Result != EResult.OK)
             {
-                Console.WriteLine("Unable to get license list: {0} ", licenseList.Result);
+                Console.WriteLine("无法获取到证书列表: {0} ", licenseList.Result);
                 Abort();
 
                 return;
             }
 
-            Console.WriteLine("Got {0} licenses for account!", licenseList.LicenseList.Count);
+            Console.WriteLine("从账户获取到 {0} 个证书！", licenseList.LicenseList.Count);
             Licenses = licenseList.LicenseList;
 
             foreach (var license in licenseList.LicenseList)
@@ -748,7 +748,7 @@ namespace DepotDownloader
             using var qrCode = new AsciiQRCode(qrCodeData);
             var qrCodeAsAsciiArt = qrCode.GetGraphic(1, drawQuietZones: false);
 
-            Console.WriteLine("Use the Steam Mobile App to sign in with this QR code:");
+            Console.WriteLine("使用 Steam 手机应用扫码此二维码登录:");
             Console.WriteLine(qrCodeAsAsciiArt);
         }
     }

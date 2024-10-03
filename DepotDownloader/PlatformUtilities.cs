@@ -43,8 +43,8 @@ namespace DepotDownloader
 
             _ = Windows.Win32.PInvoke.MessageBox(
                 Windows.Win32.Foundation.HWND.Null,
-                "Depot Downloader is a console application; there is no GUI.\n\nIf you do not pass any command line parameters, it prints usage info and exits.\n\nYou must use this from a terminal/console.",
-                "Depot Downloader",
+                "Depot 下载器是一个控制台程序; 没有对应的GUI。\n\n如果你不传递任何命令行参数，它就会输出使用方法。\n\n你必须在控制台或终端内使用此工具。",
+                "Depot 下载器",
                 Windows.Win32.UI.WindowsAndMessaging.MESSAGEBOX_STYLE.MB_OK | Windows.Win32.UI.WindowsAndMessaging.MESSAGEBOX_STYLE.MB_ICONWARNING
             );
         }

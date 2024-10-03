@@ -106,11 +106,11 @@ namespace DepotDownloader
                         }
                     }
 
-                    Console.WriteLine("Using filelist: '{0}'.", fileList);
+                    Console.WriteLine("使用文件列表: '{0}'.", fileList);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Warning: Unable to load filelist: {0}", ex);
+                    Console.WriteLine("警告: 无法读取文件列表: {0}", ex);
                 }
             }
 
@@ -127,7 +127,7 @@ namespace DepotDownloader
             var appId = GetParameter(args, "-app", ContentDownloader.INVALID_APP_ID);
             if (appId == ContentDownloader.INVALID_APP_ID)
             {
-                Console.WriteLine("Error: -app not specified!");
+                Console.WriteLine("错误: -app 未指定！");
                 return 1;
             }
 
@@ -152,7 +152,7 @@ namespace DepotDownloader
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Download failed to due to an unhandled exception: {0}", e.Message);
+                        Console.WriteLine("由于未处理的异常而下载失败: {0}", e.Message);
                         throw;
                     }
                     finally
@@ -162,7 +162,7 @@ namespace DepotDownloader
                 }
                 else
                 {
-                    Console.WriteLine("Error: InitializeSteam failed");
+                    Console.WriteLine("错误: Steam 初始化失败");
                     return 1;
                 }
 
@@ -187,7 +187,7 @@ namespace DepotDownloader
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Download failed to due to an unhandled exception: {0}", e.Message);
+                        Console.WriteLine("由于未处理的异常而下载失败: {0}", e.Message);
                         throw;
                     }
                     finally
@@ -197,7 +197,7 @@ namespace DepotDownloader
                 }
                 else
                 {
-                    Console.WriteLine("Error: InitializeSteam failed");
+                    Console.WriteLine("错误: Steam 初始化失败");
                     return 1;
                 }
 
@@ -215,7 +215,7 @@ namespace DepotDownloader
 
                 if (ContentDownloader.Config.DownloadAllPlatforms && !string.IsNullOrEmpty(os))
                 {
-                    Console.WriteLine("Error: Cannot specify -os when -all-platforms is specified.");
+                    Console.WriteLine("错误: 当指定了 -all-platforms 时不能指定 -os。");
                     return 1;
                 }
 
@@ -226,7 +226,7 @@ namespace DepotDownloader
 
                 if (ContentDownloader.Config.DownloadAllLanguages && !string.IsNullOrEmpty(language))
                 {
-                    Console.WriteLine("Error: Cannot specify -language when -all-languages is specified.");
+                    Console.WriteLine("错误: 当指定了 -all-languages 时不能指定 -language。");
                     return 1;
                 }
 
@@ -241,7 +241,7 @@ namespace DepotDownloader
                 {
                     if (depotIdList.Count != manifestIdList.Count)
                     {
-                        Console.WriteLine("Error: -manifest requires one id for every -depot specified");
+                        Console.WriteLine("错误: -manifest 需要一个给每个 -depot 定义的 ID");
                         return 1;
                     }
 
@@ -268,7 +268,7 @@ namespace DepotDownloader
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Download failed to due to an unhandled exception: {0}", e.Message);
+                        Console.WriteLine("由于未处理的异常而下载失败: {0}", e.Message);
                         throw;
                     }
                     finally
@@ -278,7 +278,7 @@ namespace DepotDownloader
                 }
                 else
                 {
-                    Console.WriteLine("Error: InitializeSteam failed");
+                    Console.WriteLine("错误: Steam 初始化失败");
                     return 1;
                 }
 
@@ -296,7 +296,7 @@ namespace DepotDownloader
                 {
                     do
                     {
-                        Console.Write("Enter account password for \"{0}\": ", username);
+                        Console.Write("请输入账号 \"{0}\" 的密码: ", username);
                         if (Console.IsInputRedirected)
                         {
                             password = Console.ReadLine();
@@ -312,7 +312,7 @@ namespace DepotDownloader
                 }
                 else if (username == null)
                 {
-                    Console.WriteLine("No username given. Using anonymous account with dedicated server subscription.");
+                    Console.WriteLine("未给予用户名。使用匿名账户和专用服务器订阅。");
                 }
             }
 
@@ -385,44 +385,44 @@ namespace DepotDownloader
         {
             // Do not use tabs to align parameters here because tab size may differ
             Console.WriteLine();
-            Console.WriteLine("Usage: downloading one or all depots for an app:");
+            Console.WriteLine("用法: 下载一个应用的一个或所有 depot:");
             Console.WriteLine("       depotdownloader -app <id> [-depot <id> [-manifest <id>]]");
-            Console.WriteLine("                       [-username <username> [-password <password>]] [other options]");
+            Console.WriteLine("                       [-username <用户名> [-password <密码>]] [其他选项]");
             Console.WriteLine();
-            Console.WriteLine("Usage: downloading a workshop item using pubfile id");
-            Console.WriteLine("       depotdownloader -app <id> -pubfile <id> [-username <username> [-password <password>]]");
-            Console.WriteLine("Usage: downloading a workshop item using ugc id");
-            Console.WriteLine("       depotdownloader -app <id> -ugc <id> [-username <username> [-password <password>]]");
+            Console.WriteLine("用法: 使用 pubfile id 下载一个创意工坊物品");
+            Console.WriteLine("       depotdownloader -app <id> -pubfile <id> [-username <用户名> [-password <密码>]]");
+            Console.WriteLine("用法: 使用 ugc id 下载一个创意工坊物品");
+            Console.WriteLine("       depotdownloader -app <id> -ugc <id> [-username <用户名> [-password <密码>]]");
             Console.WriteLine();
-            Console.WriteLine("Parameters:");
-            Console.WriteLine("  -app <#>                 - the AppID to download.");
-            Console.WriteLine("  -depot <#>               - the DepotID to download.");
-            Console.WriteLine("  -manifest <id>           - manifest id of content to download (requires -depot, default: current for branch).");
-            Console.WriteLine($"  -beta <branchname>       - download from specified branch if available (default: {ContentDownloader.DEFAULT_BRANCH}).");
-            Console.WriteLine("  -betapassword <pass>     - branch password if applicable.");
-            Console.WriteLine("  -all-platforms           - downloads all platform-specific depots when -app is used.");
-            Console.WriteLine("  -os <os>                 - the operating system for which to download the game (windows, macos or linux, default: OS the program is currently running on)");
-            Console.WriteLine("  -osarch <arch>           - the architecture for which to download the game (32 or 64, default: the host's architecture)");
-            Console.WriteLine("  -all-languages           - download all language-specific depots when -app is used.");
-            Console.WriteLine("  -language <lang>         - the language for which to download the game (default: english)");
-            Console.WriteLine("  -lowviolence             - download low violence depots when -app is used.");
+            Console.WriteLine("参数:");
+            Console.WriteLine("  -app <#>                 - 想要下载的应用的 AppID。");
+            Console.WriteLine("  -depot <#>               - 想要下载的应用的 DepotID。");
+            Console.WriteLine("  -manifest <id>           - 想要下载的内容的 manifest id (需要 -depot, 默认: 目前分支)。");
+            Console.WriteLine("  -beta <分支名>           - 如果可用则从特定分支下载 (默认: 公共).");
+            Console.WriteLine("  -betapassword <密码>     - 如果需要则填写的分支密码。");
+            Console.WriteLine("  -all-platforms           - 当使用 -app 参数时下载所有的系统特定 depot。");
+            Console.WriteLine("  -os <操作系统>            - 下载游戏对应的操作系统的版本 (windows, macos 或 linux, 默认: 此程序所运行在的操作系统)");
+            Console.WriteLine("  -osarch <架构>           - 下载游戏对应的架构的版本 (32 或 64, 默认: 主机的架构)");
+            Console.WriteLine("  -all-languages           - 当使用 -app 参数时下载所有的语言特定 depot。");
+            Console.WriteLine("  -language <语言>         - 下载游戏对应的语言的版本 (默认: 英语)");
+            Console.WriteLine("  -lowviolence             - 当使用 -app 参数时下载低暴力 depot。");
             Console.WriteLine();
-            Console.WriteLine("  -ugc <#>                 - the UGC ID to download.");
-            Console.WriteLine("  -pubfile <#>             - the PublishedFileId to download. (Will automatically resolve to UGC id)");
+            Console.WriteLine("  -ugc <#>                 - 想要下载的文件的 UGC ID。");
+            Console.WriteLine("  -pubfile <#>             - 想要下载的文件的 PublishedFileId。 (会自动解析为 UGC id)");
             Console.WriteLine();
-            Console.WriteLine("  -username <user>         - the username of the account to login to for restricted content.");
-            Console.WriteLine("  -password <pass>         - the password of the account to login to for restricted content.");
-            Console.WriteLine("  -remember-password       - if set, remember the password for subsequent logins of this user. (Use -username <username> -remember-password as login credentials)");
+            Console.WriteLine("  -username <用户名>         - 要登录以访问受限制内容的帐户的用户名。");
+            Console.WriteLine("  -password <密码>         - 要登录以访问受限制内容的帐户的密码。");
+            Console.WriteLine("  -remember-password       - 如果设置，将记住此用户的后续登录密码。 （使用 `-username <用户名> -remember-password` 作为登录凭据）");
             Console.WriteLine();
-            Console.WriteLine("  -dir <installdir>        - the directory in which to place downloaded files.");
-            Console.WriteLine("  -filelist <file.txt>     - a list of files to download (from the manifest). Prefix file path with 'regex:' if you want to match with regex.");
-            Console.WriteLine("  -validate                - Include checksum verification of files already downloaded");
+            Console.WriteLine("  -dir <安装目录>        - 要放置下载文件的目录。");
+            Console.WriteLine("  -filelist <文件.txt>     - 要下载的文件列表（来自清单）。如果要以正则表达式进行匹配，请在文件路径前加上 `regex:` 前缀。");
+            Console.WriteLine("  -validate                - 包含已下载文件的校验和验证");
             Console.WriteLine();
-            Console.WriteLine("  -manifest-only           - downloads a human readable manifest for any depots that would be downloaded.");
-            Console.WriteLine("  -cellid <#>              - the overridden CellID of the content server to download from.");
-            Console.WriteLine("  -max-servers <#>         - maximum number of content servers to use. (default: 20).");
-            Console.WriteLine("  -max-downloads <#>       - maximum number of chunks to download concurrently. (default: 8).");
-            Console.WriteLine("  -loginid <#>             - a unique 32-bit integer Steam LogonID in decimal, required if running multiple instances of DepotDownloader concurrently.");
+            Console.WriteLine("  -manifest-only           - 下载任何要下载的仓库的人类可读清单。");
+            Console.WriteLine("  -cellid <#>              - 要从中下载内容的覆盖 CellID 的服务器。");
+            Console.WriteLine("  -max-servers <#>         - 要使用的最大内容服务器数量。 （默认：20）。");
+            Console.WriteLine("  -max-downloads <#>       - 同时下载的最大块数。 （默认：8）。");
+            Console.WriteLine("  -loginid <#>             - 一个唯一的32位十进制Steam LogonID，如果同时运行多个DepotDownloader实例，则必需。");
         }
 
         static void PrintVersion(bool printExtra = false)
@@ -435,7 +435,7 @@ namespace DepotDownloader
                 return;
             }
 
-            Console.WriteLine($"Runtime: {RuntimeInformation.FrameworkDescription} on {RuntimeInformation.OSDescription}");
+            Console.WriteLine($"运行库: {RuntimeInformation.FrameworkDescription} 运行在 {RuntimeInformation.OSDescription} 系统上");
         }
     }
 }

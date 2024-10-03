@@ -47,7 +47,7 @@ namespace DepotDownloader
         public static void LoadFromFile(string filename)
         {
             if (Loaded)
-                throw new Exception("Config already loaded");
+                throw new Exception("配置文件已加载");
 
             if (IsolatedStorage.FileExists(filename))
             {
@@ -59,7 +59,7 @@ namespace DepotDownloader
                 }
                 catch (IOException ex)
                 {
-                    Console.WriteLine("Failed to load account settings: {0}", ex.Message);
+                    Console.WriteLine("无法加载配置文件: {0}", ex.Message);
                     Instance = new AccountSettingsStore();
                 }
             }
@@ -74,7 +74,7 @@ namespace DepotDownloader
         public static void Save()
         {
             if (!Loaded)
-                throw new Exception("Saved config before loading");
+                throw new Exception("请在加载前保存配置文件");
 
             try
             {
@@ -84,7 +84,7 @@ namespace DepotDownloader
             }
             catch (IOException ex)
             {
-                Console.WriteLine("Failed to save account settings: {0}", ex.Message);
+                Console.WriteLine("无法保存配置文件: {0}", ex.Message);
             }
         }
     }

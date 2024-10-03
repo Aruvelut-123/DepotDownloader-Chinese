@@ -58,7 +58,7 @@ namespace DepotDownloader
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to retrieve content server list: {0}", ex.Message);
+                Console.WriteLine("获取内容服务器列表失败: {0}", ex.Message);
             }
 
             return null;

@@ -32,7 +32,7 @@ namespace DepotDownloader
         public static void LoadFromFile(string filename)
         {
             if (Loaded)
-                throw new Exception("Config already loaded");
+                throw new Exception("配置文件已加载");
 
             if (File.Exists(filename))
             {
@@ -51,7 +51,7 @@ namespace DepotDownloader
         public static void Save()
         {
             if (!Loaded)
-                throw new Exception("Saved config before loading");
+                throw new Exception("已在加载前保存");
 
             using var fs = File.Open(Instance.FileName, FileMode.Create);
             using var ds = new DeflateStream(fs, CompressionMode.Compress);

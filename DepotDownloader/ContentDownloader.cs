@@ -201,7 +201,7 @@ namespace DepotDownloader
                 if (otherAppId == appId)
                 {
                     // This shouldn't ever happen, but ya never know with Valve. Don't infinite loop.
-                    Console.WriteLine("App {0}, Depot {1} has depotfromapp of {2}!",
+                    Console.WriteLine("应用 {0}, Depot {1} 有来自其他应用的 Depot 为 {2}!",
                         appId, depotId, otherAppId);
                     return INVALID_MANIFEST_ID;
                 }
@@ -227,7 +227,7 @@ namespace DepotDownloader
                     var password = Config.BetaPassword;
                     while (string.IsNullOrEmpty(password))
                     {
-                        Console.Write("Please enter the password for branch {0}: ", branch);
+                        Console.Write("请输入此分支的密码 {0}: ", branch);
                         Config.BetaPassword = password = Console.ReadLine();
                     }
 
@@ -240,7 +240,7 @@ namespace DepotDownloader
 
                         if (!steam3.AppBetaPasswords.TryGetValue(branch, out var appBetaPassword))
                         {
-                            Console.WriteLine("Password was invalid for branch {0}", branch);
+                            Console.WriteLine("分支 {0} 的密码错误", branch);
                             return INVALID_MANIFEST_ID;
                         }
 
@@ -252,14 +252,14 @@ namespace DepotDownloader
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Failed to decrypt branch {0}: {1}", branch, e.Message);
+                            Console.WriteLine("尝试解密分支 {0} 失败: {1}", branch, e.Message);
                             return INVALID_MANIFEST_ID;
                         }
 
                         return BitConverter.ToUInt64(manifest_bytes, 0);
                     }
 
-                    Console.WriteLine("Unhandled depot encryption for depotId {0}", depotId);
+                    Console.WriteLine("未处理的 depot 加密，其 depotId 为 {0}", depotId);
                     return INVALID_MANIFEST_ID;
                 }
 
@@ -303,7 +303,7 @@ namespace DepotDownloader
 
             if (!steam3.WaitForCredentials())
             {
-                Console.WriteLine("Unable to get steam3 credentials.");
+                Console.WriteLine("无法获取 steam3 证书。");
                 return false;
             }
 
@@ -338,7 +338,7 @@ namespace DepotDownloader
             }
             else
             {
-                Console.WriteLine("Unable to locate manifest ID for published file {0}", publishedFileId);
+                Console.WriteLine("无法获取分发文件 {0} 的 manifest ID", publishedFileId);
             }
         }
 
@@ -352,7 +352,7 @@ namespace DepotDownloader
             }
             else
             {
-                Console.WriteLine($"Unable to query UGC details for {ugcId} from an anonymous account");
+                Console.WriteLine($"无法使用匿名账户获取 {ugcId} 的 UGC 详情");
             }
 
             if (!string.IsNullOrEmpty(details?.URL))
@@ -369,7 +369,7 @@ namespace DepotDownloader
         {
             if (!CreateDirectories(appId, 0, out var installDir))
             {
-                Console.WriteLine("Error: Unable to create install directories!");
+                Console.WriteLine("错误: 无法创建安装目录！");
                 return;
             }
 
@@ -383,7 +383,7 @@ namespace DepotDownloader
             using (var file = File.OpenWrite(fileStagingPath))
             using (var client = HttpClientFactory.CreateHttpClient())
             {
-                Console.WriteLine("Downloading {0}", fileName);
+                Console.WriteLine("正在下载 {0}", fileName);
                 var responseStream = await client.GetStreamAsync(url);
                 await responseStream.CopyToAsync(file);
             }
@@ -416,7 +416,7 @@ namespace DepotDownloader
             {
                 if (steam3.RequestFreeAppLicense(appId))
                 {
-                    Console.WriteLine("Obtained FreeOnDemand license for app {0}", appId);
+                    Console.WriteLine("获取到应用 {0} 的免费许可证", appId);
 
                     // Fetch app info again in case we didn't get it fully without a license.
                     steam3.RequestAppInfo(appId, true);
@@ -424,7 +424,7 @@ namespace DepotDownloader
                 else
                 {
                     var contentName = GetAppName(appId);
-                    throw new ContentDownloaderException(string.Format("App {0} ({1}) is not available from this account.", appId, contentName));
+                    throw new ContentDownloaderException(string.Format("应用 {0} ({1}) 对此账户不可用。", appId, contentName));
                 }
             }
 
@@ -446,7 +446,16 @@ namespace DepotDownloader
             }
             else
             {
-                Console.WriteLine("Using app branch: '{0}'.", branch);
+                var branch_name = "";
+                if (branch == "public")
+                {
+                    branch_name = "公共";
+                }
+                else
+                {
+                    branch_name = branch;
+                }
+                Console.WriteLine("使用应用分支: '{0}'.", branch_name);
 
                 if (depots != null)
                 {
@@ -509,13 +518,13 @@ namespace DepotDownloader
 
                 if (depotManifestIds.Count == 0 && !hasSpecificDepots)
                 {
-                    throw new ContentDownloaderException(string.Format("Couldn't find any depots to download for app {0}", appId));
+                    throw new ContentDownloaderException(string.Format("无法找到应用 {0} 的任何可下载的 depot", appId));
                 }
 
                 if (depotIdsFound.Count < depotIdsExpected.Count)
                 {
                     var remainingDepotIds = depotIdsExpected.Except(depotIdsFound);
-                    throw new ContentDownloaderException(string.Format("Depot {0} not listed for app {1}", string.Join(", ", remainingDepotIds), appId));
+                    throw new ContentDownloaderException(string.Format("应用 {1} 没有对应的 Depot {0}", string.Join(", ", remainingDepotIds), appId));
                 }
             }
 
@@ -536,7 +545,7 @@ namespace DepotDownloader
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("App {0} was not completely downloaded.", appId);
+                Console.WriteLine("应用 {0} 未完全下载完毕。", appId);
                 throw;
             }
         }
@@ -548,7 +557,7 @@ namespace DepotDownloader
 
             if (!AccountHasAccess(depotId))
             {
-                Console.WriteLine("Depot {0} is not available from this account.", depotId);
+                Console.WriteLine("Depot {0} 对此账户不可用。", depotId);
 
                 return null;
             }
@@ -558,14 +567,14 @@ namespace DepotDownloader
                 manifestId = GetSteam3DepotManifest(depotId, appId, branch);
                 if (manifestId == INVALID_MANIFEST_ID && !string.Equals(branch, DEFAULT_BRANCH, StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.WriteLine("Warning: Depot {0} does not have branch named \"{1}\". Trying {2} branch.", depotId, branch, DEFAULT_BRANCH);
+                    Console.WriteLine("警告: Depot {0} 没有叫做 \"{1}\" 的分支。正在尝试 {2} 分支。", depotId, branch, DEFAULT_BRANCH);
                     branch = DEFAULT_BRANCH;
                     manifestId = GetSteam3DepotManifest(depotId, appId, branch);
                 }
 
                 if (manifestId == INVALID_MANIFEST_ID)
                 {
-                    Console.WriteLine("Depot {0} missing public subsection or manifest section.", depotId);
+                    Console.WriteLine("Depot {0} 缺少公共子部分或清单部分。", depotId);
                     return null;
                 }
             }
@@ -573,7 +582,7 @@ namespace DepotDownloader
             steam3.RequestDepotKey(depotId, appId);
             if (!steam3.DepotKeys.TryGetValue(depotId, out var depotKey))
             {
-                Console.WriteLine("No valid depot key for {0}, unable to download.", depotId);
+                Console.WriteLine("没有对应 {0} depot 的密钥，无法下载。", depotId);
                 return null;
             }
 
@@ -581,7 +590,7 @@ namespace DepotDownloader
 
             if (!CreateDirectories(depotId, uVersion, out var installDir))
             {
-                Console.WriteLine("Error: Unable to create install directories!");
+                Console.WriteLine("错误: 无法创建安装目录！");
                 return null;
             }
 
@@ -674,7 +683,7 @@ namespace DepotDownloader
 
             Ansi.Progress(Ansi.ProgressState.Hidden);
 
-            Console.WriteLine("Total downloaded: {0} bytes ({1} bytes uncompressed) from {2} depots",
+            Console.WriteLine("总下载: 从 {2} depot 下载了 {0} 字节 ({1} 字节未压缩)",
                 downloadCounter.totalBytesCompressed, downloadCounter.totalBytesUncompressed, depots.Count);
         }
 
@@ -682,7 +691,7 @@ namespace DepotDownloader
         {
             var depotCounter = new DepotDownloadCounter();
 
-            Console.WriteLine("Processing depot {0}", depot.DepotId);
+            Console.WriteLine("正在处理 depot {0}", depot.DepotId);
 
             ProtoManifest oldProtoManifest = null;
             ProtoManifest newProtoManifest = null;
@@ -718,7 +727,7 @@ namespace DepotDownloader
                     {
                         // We only have to show this warning if the old manifest ID was different
                         if (lastManifestId != depot.ManifestId)
-                            Console.WriteLine("Manifest {0} on disk did not match the expected checksum.", lastManifestId);
+                            Console.WriteLine("硬盘上的 manifest {0} 与预期的 checksum 不匹配。", lastManifestId);
                         oldProtoManifest = null;
                     }
                 }
@@ -727,7 +736,7 @@ namespace DepotDownloader
             if (lastManifestId == depot.ManifestId && oldProtoManifest != null)
             {
                 newProtoManifest = oldProtoManifest;
-                Console.WriteLine("Already have manifest {0} for depot {1}.", depot.ManifestId, depot.DepotId);
+                Console.WriteLine("对应 depot {1} 的 manifest {0} 已存在。", depot.ManifestId, depot.DepotId);
             }
             else
             {
@@ -749,18 +758,18 @@ namespace DepotDownloader
 
                     if (newProtoManifest != null && (expectedChecksum == null || !expectedChecksum.SequenceEqual(currentChecksum)))
                     {
-                        Console.WriteLine("Manifest {0} on disk did not match the expected checksum.", depot.ManifestId);
+                        Console.WriteLine("硬盘上的 manifest {0} 与预期的 checksum 不匹配。", depot.ManifestId);
                         newProtoManifest = null;
                     }
                 }
 
                 if (newProtoManifest != null)
                 {
-                    Console.WriteLine("Already have manifest {0} for depot {1}.", depot.ManifestId, depot.DepotId);
+                    Console.WriteLine("对应 depot {1} 的 manifest {0} 已存在。", depot.ManifestId, depot.DepotId);
                 }
                 else
                 {
-                    Console.Write("Downloading depot manifest... ");
+                    Console.Write("正在下载 depot 的 manifest... ");
 
                     DepotManifest depotManifest = null;
                     ulong manifestRequestCode = 0;
@@ -800,16 +809,16 @@ namespace DepotDownloader
                                 // If we could not get the manifest code, this is a fatal error
                                 if (manifestRequestCode == 0)
                                 {
-                                    Console.WriteLine("No manifest request code was returned for {0} {1}", depot.DepotId, depot.ManifestId);
+                                    Console.WriteLine("没有 manifest 请求代码返回给 {0} {1}", depot.DepotId, depot.ManifestId);
                                     cts.Cancel();
                                 }
                             }
 
                             DebugLog.WriteLine("ContentDownloader",
-                                "Downloading manifest {0} from {1} with {2}",
+                                "正在从 {1} 下载 manifest {0}，使用 {2} 服务器",
                                 depot.ManifestId,
                                 connection,
-                                cdnPool.ProxyServer != null ? cdnPool.ProxyServer : "no proxy");
+                                cdnPool.ProxyServer != null ? cdnPool.ProxyServer : "无节点");
                             depotManifest = await cdnPool.CDNClient.DownloadManifestAsync(
                                 depot.DepotId,
                                 depot.ManifestId,
@@ -823,7 +832,7 @@ namespace DepotDownloader
                         }
                         catch (TaskCanceledException)
                         {
-                            Console.WriteLine("Connection timeout downloading depot manifest {0} {1}. Retrying.", depot.DepotId, depot.ManifestId);
+                            Console.WriteLine("下载 depot manifest {0} {1} 时连接超时。重试中。", depot.DepotId, depot.ManifestId);
                         }
                         catch (SteamKitWebRequestException e)
                         {
@@ -841,17 +850,17 @@ namespace DepotDownloader
 
                             if (e.StatusCode == HttpStatusCode.Unauthorized || e.StatusCode == HttpStatusCode.Forbidden)
                             {
-                                Console.WriteLine("Encountered {2} for depot manifest {0} {1}. Aborting.", depot.DepotId, depot.ManifestId, (int)e.StatusCode);
+                                Console.WriteLine("下载 depot manifest {0} {1} 时遇到 HTTP 错误码 {2}。终止中。", depot.DepotId, depot.ManifestId, (int)e.StatusCode);
                                 break;
                             }
 
                             if (e.StatusCode == HttpStatusCode.NotFound)
                             {
-                                Console.WriteLine("Encountered 404 for depot manifest {0} {1}. Aborting.", depot.DepotId, depot.ManifestId);
+                                Console.WriteLine("下载 depot manifest {0} {1} 时遇到 HTTP 错误码 404。终止中。", depot.DepotId, depot.ManifestId);
                                 break;
                             }
 
-                            Console.WriteLine("Encountered error downloading depot manifest {0} {1}: {2}", depot.DepotId, depot.ManifestId, e.StatusCode);
+                            Console.WriteLine("下载 depot manifest {0} {1} 时遇到 HTTP 错误码 {2}。终止中。", depot.DepotId, depot.ManifestId, e.StatusCode);
                         }
                         catch (OperationCanceledException)
                         {
@@ -860,13 +869,13 @@ namespace DepotDownloader
                         catch (Exception e)
                         {
                             cdnPool.ReturnBrokenConnection(connection);
-                            Console.WriteLine("Encountered error downloading manifest for depot {0} {1}: {2}", depot.DepotId, depot.ManifestId, e.Message);
+                            Console.WriteLine("下载 depot manifest {0} {1} 时遇到错误: {2}", depot.DepotId, depot.ManifestId, e.Message);
                         }
                     } while (depotManifest == null);
 
                     if (depotManifest == null)
                     {
-                        Console.WriteLine("\nUnable to download manifest {0} for depot {1}", depot.ManifestId, depot.DepotId);
+                        Console.WriteLine("\n无法下载 depot {1} 的 manifest {0}", depot.ManifestId, depot.DepotId);
                         cts.Cancel();
                     }
 
@@ -878,7 +887,7 @@ namespace DepotDownloader
                     newProtoManifest.SaveToFile(newManifestFileName, out var checksum);
                     File.WriteAllBytes(newManifestFileName + ".sha", checksum);
 
-                    Console.WriteLine(" Done!");
+                    Console.WriteLine(" 完成！");
                 }
             }
 
@@ -939,7 +948,7 @@ namespace DepotDownloader
             var depot = depotFilesData.depotDownloadInfo;
             var depotCounter = depotFilesData.depotCounter;
 
-            Console.WriteLine("Downloading depot {0}", depot.DepotId);
+            Console.WriteLine("正在下载 depot {0}", depot.DepotId);
 
             var files = depotFilesData.filteredFiles.Where(f => !f.Flags.HasFlag(EDepotFileFlag.Directory)).ToArray();
             var networkChunkQueue = new ConcurrentQueue<(FileStreamData fileStreamData, ProtoManifest.FileData fileData, ProtoManifest.ChunkData chunk)>();
@@ -982,14 +991,14 @@ namespace DepotDownloader
                         continue;
 
                     File.Delete(fileFinalPath);
-                    Console.WriteLine("Deleted {0}", fileFinalPath);
+                    Console.WriteLine("已删除 {0}", fileFinalPath);
                 }
             }
 
             DepotConfigStore.Instance.InstalledManifestIDs[depot.DepotId] = depot.ManifestId;
             DepotConfigStore.Save();
 
-            Console.WriteLine("Depot {0} - Downloaded {1} bytes ({2} bytes uncompressed)", depot.DepotId, depotCounter.depotBytesCompressed, depotCounter.depotBytesUncompressed);
+            Console.WriteLine("Depot {0} - 已下载 {1} 字节 ({2} 字节未压缩)", depot.DepotId, depotCounter.depotBytesCompressed, depotCounter.depotBytesUncompressed);
         }
 
         private static void DownloadSteam3AsyncDepotFile(
@@ -1025,7 +1034,7 @@ namespace DepotDownloader
             var fileDidExist = fi.Exists;
             if (!fileDidExist)
             {
-                Console.WriteLine("Pre-allocating {0}", fileFinalPath);
+                Console.WriteLine("预获取空间 {0}", fileFinalPath);
 
                 // create new file. need all chunks
                 using var fs = File.Create(fileFinalPath);
@@ -1035,7 +1044,7 @@ namespace DepotDownloader
                 }
                 catch (IOException ex)
                 {
-                    throw new ContentDownloaderException(string.Format("Failed to allocate file {0}: {1}", fileFinalPath, ex.Message));
+                    throw new ContentDownloaderException(string.Format("无法提前获取对应空间 {0}: {1}", fileFinalPath, ex.Message));
                 }
 
                 neededChunks = new List<ProtoManifest.ChunkData>(file.Chunks);
@@ -1053,7 +1062,7 @@ namespace DepotDownloader
                         // we have a version of this file, but it doesn't fully match what we want
                         if (Config.VerifyAll)
                         {
-                            Console.WriteLine("Validating {0}", fileFinalPath);
+                            Console.WriteLine("正在验证 {0}", fileFinalPath);
                         }
 
                         var matchingChunks = new List<ChunkMatch>();
@@ -1106,7 +1115,7 @@ namespace DepotDownloader
                                 }
                                 catch (IOException ex)
                                 {
-                                    throw new ContentDownloaderException(string.Format("Failed to resize file to expected size {0}: {1}", fileFinalPath, ex.Message));
+                                    throw new ContentDownloaderException(string.Format("重设文件大小到 {0} 时遇到错误: {1}", fileFinalPath, ex.Message));
                                 }
 
                                 foreach (var match in copyChunks)
@@ -1138,11 +1147,11 @@ namespace DepotDownloader
                         }
                         catch (IOException ex)
                         {
-                            throw new ContentDownloaderException(string.Format("Failed to allocate file {0}: {1}", fileFinalPath, ex.Message));
+                            throw new ContentDownloaderException(string.Format("无法预获取文件 {0}: {1}", fileFinalPath, ex.Message));
                         }
                     }
 
-                    Console.WriteLine("Validating {0}", fileFinalPath);
+                    Console.WriteLine("验证中 {0}", fileFinalPath);
                     neededChunks = Util.ValidateSteam3FileChecksums(fs, [.. file.Chunks.OrderBy(x => x.Offset)]);
                 }
 
@@ -1243,7 +1252,7 @@ namespace DepotDownloader
                             cdnToken = result.Token;
                         }
 
-                        DebugLog.WriteLine("ContentDownloader", "Downloading chunk {0} from {1} with {2}", chunkID, connection, cdnPool.ProxyServer != null ? cdnPool.ProxyServer : "no proxy");
+                        DebugLog.WriteLine("ContentDownloader", "正在从 {1} 下载 chunk {0}，使用服务器 {2}", chunkID, connection, cdnPool.ProxyServer != null ? cdnPool.ProxyServer : "无代理");
                         written = await cdnPool.CDNClient.DownloadDepotChunkAsync(
                             depot.DepotId,
                             data,
@@ -1259,7 +1268,7 @@ namespace DepotDownloader
                     }
                     catch (TaskCanceledException)
                     {
-                        Console.WriteLine("Connection timeout downloading chunk {0}", chunkID);
+                        Console.WriteLine("下载 chunk {0} 时连接超时", chunkID);
                     }
                     catch (SteamKitWebRequestException e)
                     {
@@ -1279,11 +1288,11 @@ namespace DepotDownloader
 
                         if (e.StatusCode == HttpStatusCode.Unauthorized || e.StatusCode == HttpStatusCode.Forbidden)
                         {
-                            Console.WriteLine("Encountered {1} for chunk {0}. Aborting.", chunkID, (int)e.StatusCode);
+                            Console.WriteLine("下载 chunk {0} 时遇到错误 {1}。终止中。", chunkID, (int)e.StatusCode);
                             break;
                         }
 
-                        Console.WriteLine("Encountered error downloading chunk {0}: {1}", chunkID, e.StatusCode);
+                        Console.WriteLine("下载 chunk {0} 时遇到错误: {1}", chunkID, e.StatusCode);
                     }
                     catch (OperationCanceledException)
                     {
@@ -1292,13 +1301,13 @@ namespace DepotDownloader
                     catch (Exception e)
                     {
                         cdnPool.ReturnBrokenConnection(connection);
-                        Console.WriteLine("Encountered unexpected error downloading chunk {0}: {1}", chunkID, e.Message);
+                        Console.WriteLine("下载 chunk {0} 时遇到未知错误: {1}", chunkID, e.Message);
                     }
                 } while (written == 0);
 
                 if (written == 0)
                 {
-                    Console.WriteLine("Failed to find any server with chunk {0} for depot {1}. Aborting.", chunkID, depot.DepotId);
+                    Console.WriteLine("无法找到任何拥有 depot {1} 的 chunk {0} 的服务器。终止中。", chunkID, depot.DepotId);
                     cts.Cancel();
                 }
 
@@ -1364,9 +1373,9 @@ namespace DepotDownloader
             var txtManifest = Path.Combine(depot.InstallDir, $"manifest_{depot.DepotId}_{depot.ManifestId}.txt");
             using var sw = new StreamWriter(txtManifest);
 
-            sw.WriteLine($"Content Manifest for Depot {depot.DepotId}");
+            sw.WriteLine($"内容 Depot 的 Manifest {depot.DepotId}");
             sw.WriteLine();
-            sw.WriteLine($"Manifest ID / date     : {depot.ManifestId} / {manifest.CreationTime}");
+            sw.WriteLine($"Manifest ID / 日期     : {depot.ManifestId} / {manifest.CreationTime}");
 
             int numFiles = 0, numChunks = 0;
             ulong uncompressedSize = 0, compressedSize = 0;
@@ -1386,10 +1395,10 @@ namespace DepotDownloader
                 }
             }
 
-            sw.WriteLine($"Total number of files  : {numFiles}");
-            sw.WriteLine($"Total number of chunks : {numChunks}");
-            sw.WriteLine($"Total bytes on disk    : {uncompressedSize}");
-            sw.WriteLine($"Total bytes compressed : {compressedSize}");
+            sw.WriteLine($"总文件数: {numFiles}");
+            sw.WriteLine($"总 chunk 数: {numChunks}");
+            sw.WriteLine($"占用空间: {uncompressedSize}");
+            sw.WriteLine($"压缩后空间: {compressedSize}");
             sw.WriteLine();
             sw.WriteLine("          Size Chunks File SHA                                 Flags Name");
 

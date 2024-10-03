@@ -5,9 +5,9 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <RollForward>LatestMajor</RollForward>
     <Version>2.7.1</Version>
-    <Description>Steam Downloading Utility</Description>
-    <Authors>SteamRE Team</Authors>
-    <Copyright>Copyright © SteamRE Team 2024</Copyright>
+    <Description>Steam 下载工具</Description>
+    <Authors>SteamRE 团队</Authors>
+    <Copyright>版权所有 © SteamRE 团队 2024</Copyright>
     <ApplicationIcon>..\Icon\DepotDownloader.ico</ApplicationIcon>
     <Deterministic>true</Deterministic>
     <TreatWarningsAsErrors Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</TreatWarningsAsErrors>
